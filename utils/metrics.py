@@ -225,3 +225,66 @@ class Metrics:
         f1 = 2 * (precision * recall) / (precision + recall)
 
         return f1
+
+    def mae(y_true, y_pred):
+        """
+        Calculates the mean absolute error of the model.
+
+        Parameters:
+
+        - y_true (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        - y_pred (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        Returns:
+
+        - result (float):
+            The mean absolute error of the model.
+
+        """
+
+        return np.mean(np.abs(y_true - y_pred))
+    
+    def mse(y_true, y_pred):
+        """
+        Calculates the mean squared error of the model.
+
+        Parameters:
+
+        - y_true (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        - y_pred (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        Returns:
+
+        - result (float):
+            The mean squared error of the model.
+
+        """
+
+        return np.mean(np.power(y_true - y_pred, 2))
+    
+    def rmse(y_true, y_pred):
+        """
+        Calculates the root mean squared error of the model.
+
+        Parameters:
+
+        - y_true (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        - y_pred (numpy.ndarray):
+            A 1D array of shape (m_samples, ) representing m_samples each with it's label output.
+
+        Returns:
+
+        - result (float):
+            The root mean squared error of the model.
+
+        """
+
+        return np.sqrt(np.mean(np.power(y_true - y_pred, 2)))

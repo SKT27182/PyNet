@@ -622,3 +622,126 @@ class LinearSearchGD(BaseGD):
                 print(
                     f"Loss is nan at iteration {i}. Hence, stopping the training")
                 break
+
+class LinearRegression:
+    def __init__(self, loss, optimizer, l1, l2, max_iter=1000, tol=None, bias=False):
+        self.loss = loss
+        self.optimizer = optimizer
+        self.l1 = l1
+        self.l2 = l2
+        self.max_iter = max_iter
+        self.tol = tol
+        self.bias = bias
+        self.weights = None
+        self.gradient = None
+        self.loss_history = []
+        super().__init__()
+
+    def _preprocess_input_data(self, X):
+        """
+        Convert input data to numpy.ndarray and reshape it if needed
+
+        Parameters
+        ----------
+        X : numpy.ndarray , shape (m_samples, n_features)
+            Training data
+
+        Returns
+        -------
+        X : numpy.ndarray , shape (m_samples, n_features)
+            Training data after preprocessing like converting to numpy.ndarray and reshaping
+        """
+        # if input data is not numpy.ndarray then  convert it
+        if isinstance(X, np.ndarray):
+            pass
+        else:
+            X = np.array(X)
+
+        # if only one sample is given then reshape it
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
+
+        return X.astype(np.float64)
+    
+    def _y_hat(self, X, w):
+
+        """
+        Calculate the predicted value of y
+
+        Parameters
+        ----------
+        X : numpy.ndarray , shape (m_samples, n_features)
+            Testing data
+
+        w : numpy.ndarray , shape (n_features + 1 ) +1 for bias
+            Weights
+
+        Returns
+        -------
+        y_hat : numpy.ndarray , shape (m_samples, )
+            Calculated value of y
+        """
+        return np.dot(X, w.T)
+    
+    def _weights(self, n):
+
+        """
+        Initialize weights
+
+        Parameters
+        ----------
+        n : int
+            Number of features
+
+        Returns
+        -------
+        weights : numpy.ndarray , shape (n_features + 1 ) +1 for bias
+            Weights
+
+        """
+        if self.bias:
+            return np.random.uniform(low=-1, high=1, size=n +1)
+            # return np.random.random(n+1)
+
+        else:
+            return np.random.uniform(low=-1, high=1, size=n)
+            # return np.random.random(n)
+
+
+
+
+    def fit(self, X, y):
+        X = self._preprocess_input_data(X)
+
+        self.weights = self._weights(X.shape[1]).reshape(-1, 1)
+
+
+        for i in range(self.max_iter):
+            y_hat = self._y_hat(X, self.weights).reshape(-1, 1)
+
+            self.gradient = self.loss.loss_prime(y.T, y_hat.T).T
+
+            # Regularization
+            if self.l1 > 0:
+                self.gradient += self.l1 * np.sign(self.weights)
+            if self.l2 > 0:
+                self.gradient[1:] += self.l2 * self.weights[1:]
+
+            self.weights -= self.optimizer.update(self.gradient)
+
+            # keeping track of cost/loss
+            y_hat = self._y_hat(X, self.weights)
+            self.loss_history.append(self.loss(y_hat, y))
+
+            # Break the loop if loss is not changing much
+            if i > 0 and self.tol is not None:
+                if abs(self.loss_history[-1] - self.loss_history[-2])/self.loss_history[-2] < self.tol:
+                    print(
+                        f"Loss is not changing much at iteration {i}. Hence, stopping the training")
+                    break
+
+            # break the loop if loss is nan
+            if np.isnan(self.loss_history[-1]):
+                print(
+                    f"Loss is nan at iteration {i}. Hence, stopping the training")
+                break

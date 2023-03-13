@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 class Loss:
@@ -27,7 +26,7 @@ class Loss:
 
     """
 
-    def __init__(self, l1 = 0, l2 = 0) -> None:
+    def __init__(self, l1=0, l2=0) -> None:
         self.l1 = l1
         self.l2 = l2
 
@@ -73,13 +72,14 @@ class Loss:
 
         """
         raise NotImplementedError
-    
+
     def __str__(self) -> str:
         return self.__class__.__name__
-    
+
     def __repr__(self) -> str:
         return self.__class__.__name__
-            
+
+
 class MSE(Loss):
 
     """
@@ -87,22 +87,23 @@ class MSE(Loss):
     """
 
     def loss(self, y_true, y_pred, ws):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
-        cost = np.sum(np.power(y_pred - y_true, 2)) / (2 * m_samples)
-            
+        cost = np.sum(np.power(np.subtract(y_pred, y_true), 2)) / (2 * m_samples)
+
         reg_term = 0
-        reg_term += (self.l1/m_samples) * ws[0]
-        reg_term += (self.l2/(2*m_samples)) * ws[1]
+        reg_term += (self.l1 / m_samples) * ws[0]
+        reg_term += (self.l2 / (2 * m_samples)) * ws[1]
 
         return cost + reg_term
 
     def loss_prime(self, y_true, y_pred):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
-        cost_prime =  (y_pred - y_true) / (m_samples)
+        cost_prime = (np.subtract(y_pred, y_true)) / (m_samples)
 
         return cost_prime
+
 
 class MAE(Loss):
 
@@ -110,24 +111,24 @@ class MAE(Loss):
     Mean absolute error loss function.
     """
 
-
     def loss(self, y_true, y_pred, ws):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
-        cost = np.sum(np.abs(y_pred - y_true)) / (m_samples)
+        cost = np.sum(np.abs(np.subtract(y_pred, y_true))) / (m_samples)
 
         reg_term = 0
-        reg_term += (self.l1/m_samples) * ws[0]
-        reg_term += (self.l2/(2*m_samples)) * ws[1]
-        
+        reg_term += (self.l1 / m_samples) * ws[0]
+        reg_term += (self.l2 / (2 * m_samples)) * ws[1]
+
         return cost + reg_term
 
     def loss_prime(self, y_true, y_pred):
-        m_samples = y_pred.shape[1]
-        
-        cost_prime = np.sign(y_true - y_pred) / m_samples
+        m_samples = y_pred.shape[-1]
 
-        return cost_prime 
+        cost_prime = np.sign(np.subtract(y_pred, y_true)) / m_samples
+
+        return cost_prime
+
 
 class BinaryCrossentropy(Loss):
 
@@ -136,7 +137,7 @@ class BinaryCrossentropy(Loss):
     """
 
     def loss(self, y_true, y_pred, ws):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
         cost = (
             -np.sum(
                 y_true * np.log(y_pred + 1e-10)
@@ -146,18 +147,21 @@ class BinaryCrossentropy(Loss):
         )
 
         reg_term = 0
-        reg_term += (self.l1/m_samples) * ws[0]
-        reg_term += (self.l2/(2*m_samples)) * ws[1]
-        
+        reg_term += (self.l1 / m_samples) * ws[0]
+        reg_term += (self.l2 / (2 * m_samples)) * ws[1]
+
         return cost + reg_term
 
     def loss_prime(self, y_true, y_pred):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
-        cost_prime = ((y_pred - y_true) / (y_pred * (1 - y_pred + 1e-10))) / m_samples
+        cost_prime = (
+            (np.subtract(y_pred, y_true)) / (y_pred * (1 - y_pred + 1e-10))
+        ) / m_samples
 
-        return cost_prime 
-   
+        return cost_prime
+
+
 class CategoricalCrossentropy(Loss):
 
     """
@@ -165,23 +169,23 @@ class CategoricalCrossentropy(Loss):
     """
 
     def loss(self, y_true, y_pred, ws):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
-        cost = -np.sum(y_true * np.log(y_pred + 1e-10))   # shape = (batch_size,)
+        cost = -np.sum(y_true * np.log(y_pred + 1e-10))  # shape = (batch_size,)
 
-        cost = cost / m_samples  
+        cost = cost / m_samples
 
         reg_term = 0
-        reg_term += (self.l1/m_samples) * ws[0]
-        reg_term += (self.l2/(2*m_samples)) * ws[1]
+        reg_term += (self.l1 / m_samples) * ws[0]
+        reg_term += (self.l2 / (2 * m_samples)) * ws[1]
 
         return cost + reg_term
-    
+
     def loss_prime(self, y_true, y_pred):
-        m_samples = y_pred.shape[1]
+        m_samples = y_pred.shape[-1]
 
         # this is little bit different from the else loss_prime,
-        # this return the (dJ/dA)*(dA/dz) so we don't need to find the derivative of sofmax_prime 
-        cost_prime = (y_pred - y_true) / m_samples
+        # this return the (dJ/dA)*(dA/dz) so we don't need to find the derivative of sofmax_prime
+        cost_prime = (np.subtract(y_pred, y_true)) / m_samples
 
         return cost_prime
