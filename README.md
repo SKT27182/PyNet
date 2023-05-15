@@ -1,10 +1,6 @@
 # Deep_Learning_Models
 
 
-# Linear Regression using BatchGD, MiniBatchGD and StochasticGD
-
-# Logistic Regression for BinaryClassification and OneVsAll and Softmax
-
 # Neural Network
 
 ## Made a module for layers in which added different types of layers
@@ -66,3 +62,14 @@
 - RMSprop
 	
 - Adam
+
+
+---
+
+---
+
+- Few other work on ML model from scratch
+
+## Linear Regression using BatchGD, MiniBatchGD and StochasticGD
+
+## Logistic Regression for BinaryClassification and OneVsAll and Softmax
